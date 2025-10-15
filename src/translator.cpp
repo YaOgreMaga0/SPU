@@ -37,6 +37,8 @@ int FillByteOutput(struct Line* index, const char* filename, int  len)
         return 1;
     }
 
+    FillSignature(outfile, index, len);
+
     for(int i = 0; i < len; i++)
     {
         const char* string = index[i].string;
@@ -72,4 +74,11 @@ int CleanBuf(struct Line* index, int len)
         }
     }
     return 0;
+}
+
+int FillSignature(FILE* outfile, struct Line* index, int len)
+{
+    float version = 1.10;
+    fwrite(&version, sizeof(float), 1, outfile); //позже тут еще что нибудь добавлю
+    fwrite(&len, sizeof(int), 1, outfile);
 }

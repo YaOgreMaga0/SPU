@@ -10,5 +10,7 @@
 int Translator(char* filenamein, char* filenameout);
 int FillByteOutput(struct Line* index, const char* filename, int len);
 int CleanBuf(struct Line* index, int len);
+int FillSignature(FILE* outfile, struct Line* index, int len);
+
 
 #endif //TRANSLATOR_H

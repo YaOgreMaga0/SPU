@@ -22,8 +22,8 @@ typedef enum
     HLT = 7
 }command;
 
-void CommSwitch(int comm, stack* stk, FILE* fp, mode m);
-void Bpush(stack*stk, FILE* fp);
+void CommSwitch(int comm, stack* stk, FILE* fp, mode m, int arg);
+void Bpush(stack*stk, int arg);
 void Lpush(stack*stk, FILE* fp);
 void out(stack* stk);
 void add(stack* stk);

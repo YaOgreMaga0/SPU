@@ -6,6 +6,7 @@
 
 int ByteCode(char* filename);
 int GetByte(FILE* fp);
-int FillStack(char* filename);
+int CheckSignature(FILE* code, int* PC);
+int FillStack(FILE* code, int PC, stack* stk);
 
 #endif //BYTECODE_H

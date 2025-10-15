@@ -14,7 +14,7 @@ int LanguageCode(char* filename)
             StackDtor(&stk);
             return 0;
         }
-        CommSwitch(command, &stk, fp, LAN);
+        CommSwitch(command, &stk, fp, LAN, 0);
     }
     fclose(fp);
     StackDtor(&stk);
