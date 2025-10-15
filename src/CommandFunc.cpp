@@ -1,6 +1,13 @@
 #include "../src_h/CommandFunc.h"
 
-void push(stack* stk, FILE* fp)
+void Bpush(stack* stk, FILE* fp)
+{
+    stack_type arg = 0;
+    fread(&arg, sizeof(int), 1, fp);
+    StackPush(stk, arg);
+}
+
+void Lpush(stack* stk, FILE* fp)
 {
     stack_type arg = 0;
     fscanf(fp, "%d", &arg);
@@ -41,10 +48,12 @@ void div(stack* stk)
     StackPush(stk, value1 / value2);
 }
 
-void CommSwitch(int comm, stack* stk, FILE* fp)
+void CommSwitch(int comm, stack* stk, FILE* fp, mode m)
 {
-    if(comm == PUSH)
-        push(stk, fp);
+    if(comm == PUSH && m == LAN)
+        Lpush(stk, fp);
+    if(comm == PUSH && m == BIN)
+        Bpush(stk, fp);
     if(comm == OUT)
         out(stk);
     if(comm == ADD)
@@ -56,10 +65,3 @@ void CommSwitch(int comm, stack* stk, FILE* fp)
     if(comm == DIV)
         div(stk);
 }
-
-
-/*
-switch(comm)
-
-
-*/

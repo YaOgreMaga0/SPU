@@ -30,7 +30,7 @@ int FillByteOutput(struct Line* index, const char* filename, int  len)
     assert(filename != NULL);
     assert(len > 0);
 
-    FILE* outfile = fopen(filename, "w");
+    FILE* outfile = fopen(filename, "wb");
     if(outfile == NULL)
     {
         fprintf(stderr, "Error file open\n");
@@ -44,8 +44,7 @@ int FillByteOutput(struct Line* index, const char* filename, int  len)
         fwrite(&command, sizeof(int), 1, outfile);
         if(command == PUSH)
         {
-            int arg = atoi(string + 4);
-            fprintf(stderr, "%d ", arg);
+            int arg = atoi(string + 5);
             fwrite(&arg, sizeof(int), 1, outfile);
         }
     }

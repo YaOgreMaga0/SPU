@@ -7,6 +7,12 @@
 
 typedef enum
 {
+    BIN,
+    LAN
+}mode;
+
+typedef enum
+{
     PUSH = 1,
     OUT = 2,
     ADD = 3,
@@ -16,8 +22,9 @@ typedef enum
     HLT = 7
 }command;
 
-void CommSwitch(int comm, stack* stk, FILE* fp);
-void push(stack*stk, FILE* fp);
+void CommSwitch(int comm, stack* stk, FILE* fp, mode m);
+void Bpush(stack*stk, FILE* fp);
+void Lpush(stack*stk, FILE* fp);
 void out(stack* stk);
 void add(stack* stk);
 void sub(stack* stk);

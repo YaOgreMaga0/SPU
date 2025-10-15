@@ -31,6 +31,13 @@ int main(int argc, char* argv[])
             Translator(argv[2], argv[3]);
             return 0;
         }
+        /*
+        else if(strncmp(argv[1], "--detranslator", 14) == 0)
+        {
+            Detranslator(argv[2], argv[3]);
+            return 0;
+        }
+        */
         else
         {
             fprintf(stderr, "unknown command");

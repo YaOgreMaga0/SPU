@@ -9,9 +9,9 @@ int ByteCode(char* filename)
 
 int GetByte(FILE* fp)
 {
-    int command = 0;
-    fread(&command, sizeof(int), 1, fp);
-    return command;
+    int byte = 0;
+    fread(&byte, sizeof(int), 1, fp);
+    return byte;
 }
 
 int FillStack(char* filename)
@@ -22,14 +22,13 @@ int FillStack(char* filename)
     for(int i = 0; i < 11; i++)
     {
         int command = GetByte(fp);
-        fprintf(stderr, "%d \n", command);
         if(command == HLT)
         {
             fclose(fp);
             StackDtor(&stk);
             return 0;
         }
-        CommSwitch(command, &stk, fp);
+        CommSwitch(command, &stk, fp, BIN);
     }
     fclose(fp);
     StackDtor(&stk);
