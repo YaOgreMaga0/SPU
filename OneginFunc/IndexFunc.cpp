@@ -1,20 +1,20 @@
 #include "StringFunc.h"
 #include "IndexFunc.h"
 
-unsigned long long int CountOfSymbols(const char* name)
+int CountOfSymbols(const char* name)
 {
     assert(name != NULL);
 
     struct stat fileinf = {};
     stat(name, &fileinf);
-    unsigned long long int cnt = fileinf.st_size;
-    if(cnt == 0)
+    int SymbolsCount = (int)fileinf.st_size;
+    if(SymbolsCount == 0)
         return -1;
 
-    return cnt;
+    return SymbolsCount;
 }
 
-FillIndex(char* buf, Line* index, long long int count)
+int FillIndex(char* buf, Line* index, long long int count)
 {
     if(buf == NULL || index == NULL || count == 0)
         return -1;
@@ -32,6 +32,7 @@ FillIndex(char* buf, Line* index, long long int count)
         LineLen++;
         buf += sizeof(char);
     }
+    return 0;
 }
 
 
@@ -41,8 +42,8 @@ int FillOutput(struct Line* index, const char* filename, int  len)
     assert(filename != NULL);
     assert(len > 0);
 
-    FILE* outfile = fopen(filename, "w");
-    if(outfile == NULL)
+    FILE* OutFile = fopen(filename, "wb");
+    if(OutFile == NULL)
     {
         printf("Error file open\n");
         return 1;
@@ -51,25 +52,24 @@ int FillOutput(struct Line* index, const char* filename, int  len)
     for(int i = 0; i < len; i++)
     {
         const char* string = index[i].string;
-        fputs(string, outfile);
-        fputs("\n", outfile);
+        fputs(string, OutFile);
+        fputs("\n", OutFile);
     }
-    fclose(outfile);
+    fclose(OutFile);
     return 0;
 }
 
 
-unsigned int FillBuf(unsigned long long int cnt, FILE* text, char* buf)
+int FillBuf(const int SymbolsCount, FILE* text, char* buf)
 {
     assert(text != NULL);
     assert(buf != NULL);
-    if (cnt == -1)
+    if (SymbolsCount == -1)
         return -1;
 
-    char c = '\0';
-    unsigned int CountOfLines = 0;
-    size_t freadcnt = fread(buf, cnt, sizeof(char), text);
-    for(long long int i = 0; i < cnt; i++)
+    int CountOfLines = 0;
+    fread(buf, (size_t)SymbolsCount, sizeof(char), text);
+    for(long long int i = 0; i < SymbolsCount; i++)
     {
         if(buf[i] == '\n')
         {

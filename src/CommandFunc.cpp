@@ -1,65 +1,152 @@
 #include "../src_h/CommandFunc.h"
 
-void Bpush(stack* stk, int arg)
+void push(SPUMem* SPUMemory)
 {
-    StackPush(stk, arg);
+    int arg = SPUMemory->commands[SPUMemory->command_pointer];
+    StackPush(&SPUMemory->Calculations, arg);
 }
 
-void Lpush(stack* stk, FILE* fp)
+void out(SPUMem* SPUMemory)
 {
-    stack_type arg = 0;
-    fscanf(fp, "%d", &arg);
-    StackPush(stk, arg);
+    int value = StackPop(&SPUMemory->Calculations);
+    printf("%d\n", value);
 }
 
-void out(stack* stk)
+void add(SPUMem* SPUMemory)
 {
-    stack_type value = StackPop(stk);
-    printf("%d ", value);
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    StackPush(&SPUMemory->Calculations, value1 + value2);
 }
 
-void add(stack* stk)
+void sub(SPUMem* SPUMemory)
 {
-    stack_type value1 = StackPop(stk);
-    stack_type value2 = StackPop(stk);
-    StackPush(stk, value1 + value2);
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    StackPush(&SPUMemory->Calculations, value1 - value2);
 }
 
-void sub(stack* stk)
+void mul(SPUMem* SPUMemory)
 {
-    stack_type value1 = StackPop(stk);
-    stack_type value2 = StackPop(stk);
-    StackPush(stk, value1 - value2);
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    StackPush(&SPUMemory->Calculations, value1 * value2);
 }
 
-void mul(stack* stk)
+void div(SPUMem* SPUMemory)
 {
-    stack_type value1 = StackPop(stk);
-    stack_type value2 = StackPop(stk);
-    StackPush(stk, value1 * value2);
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    StackPush(&SPUMemory->Calculations, value1 / value2);
 }
 
-void div(stack* stk)
+void pushr(SPUMem* SPUMemory)
 {
-    stack_type value1 = StackPop(stk);
-    stack_type value2 = StackPop(stk);
-    StackPush(stk, value1 / value2);
+    int reg = SPUMemory->commands[SPUMemory->command_pointer];
+    SPUMemory->registers[reg] = StackPop(&SPUMemory->Calculations);
 }
 
-void CommSwitch(int comm, stack* stk, FILE* fp, mode m, int arg)
+void popr(SPUMem* SPUMemory)
 {
-    if(comm == PUSH && m == LAN)
-        Lpush(stk, fp);
-    if(comm == PUSH && m == BIN)
-        Bpush(stk, arg);
-    if(comm == OUT)
-        out(stk);
-    if(comm == ADD)
-        add(stk);
-    if(comm == SUB)
-        sub(stk);
-    if(comm == MUL)
-        mul(stk);
-    if(comm == DIV)
-        div(stk);
+    int reg = SPUMemory->commands[SPUMemory->command_pointer];
+    StackPush(&SPUMemory->Calculations, SPUMemory->registers[reg]);
+}
+
+void jmp(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    SPUMemory->command_pointer = label_pointer;
+}
+
+void jb(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    if(value1 > value2)
+        SPUMemory->command_pointer = label_pointer;
+}
+
+void jbe(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    if(value1 >= value2)
+        SPUMemory->command_pointer = label_pointer;
+}
+
+void ja(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    if(value1 < value2)
+        SPUMemory->command_pointer = label_pointer;
+}
+
+void jae(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    if(value1 <= value2)
+        SPUMemory->command_pointer = label_pointer;
+}
+
+void je(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    if(value1 == value2)
+        SPUMemory->command_pointer = label_pointer;
+}
+
+void jne(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    int value1 = StackPop(&SPUMemory->Calculations);
+    int value2 = StackPop(&SPUMemory->Calculations);
+    if(value1 != value2)
+        SPUMemory->command_pointer = label_pointer;
+}
+
+void call(SPUMem* SPUMemory)
+{
+    int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
+    StackPush(&SPUMemory->Returns, SPUMemory->command_pointer);
+    SPUMemory->command_pointer = label_pointer;
+}
+
+void ret(SPUMem* SPUMemory)
+{
+    int ret = StackPop(&SPUMemory->Returns);
+    SPUMemory->command_pointer = ret;
+}
+
+void draw(SPUMem* SPUMemory)
+{
+    for(int i = 0; i < vertical; i++)
+    {
+        for(int j = 0; j < horizontal; j++)
+            printf("%c", SPUMemory->RAM[i * horizontal + j]);
+        printf("\n");
+    }
+}
+
+void pushmem(SPUMem* SPUMemory)
+{
+    int reg = SPUMemory->commands[SPUMemory->command_pointer];
+    int value = SPUMemory->registers[reg];
+    SPUMemory->registers[reg] = 0;
+    SPUMemory->RAM[reg] = value;
+}
+
+void popmem(SPUMem* SPUMemory)
+{
+    int reg = SPUMemory->commands[SPUMemory->command_pointer];
+    int value = SPUMemory->registers[reg];
+    SPUMemory->registers[reg] = 0;
+    StackPush(&SPUMemory->Calculations, value);
 }

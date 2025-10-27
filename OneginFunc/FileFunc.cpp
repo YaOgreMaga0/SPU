@@ -1,33 +1,30 @@
 #include "FileFunc.h"
 
-struct BufAndIndexInf FileReadAndMakeBuf(const char* filename)
+Index MakeIndex(const char* filename)
 {
-    unsigned long long int symbolscnt = CountOfSymbols(filename); //get count of symbols from file
-    if(symbolscnt == -1)
-        printf("file is empty\n");
+    int SymbolsCount = CountOfSymbols(filename);
+    if(SymbolsCount == -1)
+        fprintf(stderr, "file is empty\n");
 
-    char* buf = (char*)calloc(symbolscnt, sizeof(char)); //make buffer
+    char* buf = (char*)calloc((size_t)SymbolsCount, sizeof(char));
     if(buf == NULL)
-        printf("memory allocation error\n");
-
-    FILE* text = fopen(filename, "r"); //open file
+        fprintf(stderr, "memory allocation error1\n");
+    FILE* text = fopen(filename, "rb");
     if(text == NULL)
-        printf("Error file input open\n");
+        fprintf(stderr, "Error file input open\n");
 
-    unsigned int linecount = FillBuf(symbolscnt, text, buf); //Fill buffer and return count of lines
-    fclose(text); //close file
-
-    Line* index = (Line*)calloc(linecount, sizeof(struct Line)); //make index struct array
+    int CntLines = FillBuf(SymbolsCount, text, buf);
+    fclose(text);
+    Line* index = (Line*)calloc((size_t)CntLines, sizeof(struct Line));
     if(index == NULL)
-        printf("memory allocation error\n");
+        fprintf(stderr, "memory allocation error2\n");
 
-    FillIndex(buf, index, symbolscnt - linecount);   //fill index array. subtract linecount because "\r" is deleted from buffer, but contained in symbolscnt
-
-    return {buf, index, (int)linecount};
+    FillIndex(buf, index, SymbolsCount);
+    return {buf, index, CntLines};
 }
 
 
-void MemoryFree(BufAndIndexInf *Inf)
+void MemoryFree(Index *Inf)
 {
     free(Inf->index);
     free(Inf->buf);

@@ -1,4 +1,5 @@
 *.txt
+execute/
 *.exe
 obj/
 *.o

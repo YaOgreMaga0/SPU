@@ -24,7 +24,7 @@ int FrontCompare(const void* a, const void* b)
 }
 
 
-void MySort(struct Line* index, int len)
+void MySort(Line* index, int len)
 {
     assert(index != NULL);
     assert(len > 0);
@@ -92,7 +92,8 @@ void BubleQsort(void* begin, size_t count, size_t size, int(*CompFunc)(const voi
 {
     assert(begin != NULL);
 
-    for(size_t i = 1; i < count; i++)
+    size_t i = 0;
+    for(i = 1; i < count; i++)
     {
         for(size_t j = 0; j < count - i; j++)
         {
@@ -105,7 +106,7 @@ void BubleQsort(void* begin, size_t count, size_t size, int(*CompFunc)(const voi
             }
             if(res != -1)
             {
-                for(size_t i = 0; i < size; i++)
+                for(i = 0; i < size; i++)
                 {
                     char swap = *((char*)((size_t)begin + j * size + i));
                     *((char*)((size_t)begin + j * size + i)) = *((char*)((size_t)begin + j * size + i + size));

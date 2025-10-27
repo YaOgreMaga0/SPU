@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "cwchar": "cpp",
+        "type_traits": "cpp",
+        "cmath": "cpp",
+        "limits": "cpp"
+    }
+}

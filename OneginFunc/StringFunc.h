@@ -1,6 +1,5 @@
 #ifndef STRINGFUNC_H
 #define STRINGFUNC_H
-#define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -15,7 +14,7 @@
 
 typedef struct Line
 {
-    unsigned int len;
+    int len;
     char* string;
 }Line;
 
