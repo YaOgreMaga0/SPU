@@ -1,13 +1,7 @@
-PUSH 10
-CALL :time_need_to_do_task
-CALL :time_need_to_do_task
-CALL :time_need_to_do_task
-CALL :time_need_to_do_task
-CALL :time_need_to_do_task
-OUT
-HLT
+PUSH 11
+PUSHR AX
+PUSHMEM [AX]
 
-:time_need_to_do_task
-PUSH 10
-MUL
-RET
+
+DRAW
+HLT

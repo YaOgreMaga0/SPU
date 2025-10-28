@@ -3,8 +3,8 @@
 
 #include "../StackFunc/Stack.h"
 
-const int horizontal = 10;
-const int vertical = 10;
+const int horizontal = 40;
+const int vertical = 40;
 const int RAM_size = horizontal * vertical;
 const int reg_count = 4;
 
@@ -46,7 +46,7 @@ typedef struct
     int registers[reg_count];
     int* Jumps;
     stack Returns;
-    char RAM[RAM_size];
+    char* RAM;
 } SPUMem;
 
 

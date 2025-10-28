@@ -141,7 +141,10 @@ void draw(SPUMem* SPUMemory)
     for(int i = 0; i < vertical; i++)
     {
         for(int j = 0; j < horizontal; j++)
-            printf("%c", SPUMemory->RAM[i * horizontal + j]);
+        {
+            char pixel = SPUMemory->RAM[i * horizontal + j];
+            printf("%c", pixel);
+        }
         printf("\n");
     }
 }
