@@ -46,7 +46,7 @@ typedef struct
     int registers[reg_count];
     int* Jumps;
     stack Returns;
-    int RAM[RAM_size];
+    char RAM[RAM_size];
 } SPUMem;
 
 

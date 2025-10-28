@@ -23,7 +23,7 @@ typedef struct
 
 const float assembler_version = 1.3f;
 
-int CodeSize(Index* Text);
+int CodeSize(Index* Text, int* LabelsCount, label** labels);
 int MakeCode(Index* Text, const char* FilenameOut);
 int GetCommand(int i, Index* Text);
 int GetPushArg(Index* Text, int i, int j);
@@ -31,6 +31,5 @@ int GetJumpArg(Index* Text, int i, int j, int LabelsCount, label* labels);
 int GetArg(Index* Text, int i, int j);
 int CleanBuf(Index* Text);
 int FillSignature(FILE* OutFile, int code_commands_count);
-label* FillLabels(int* LabelsCount, Index* Text);
 
 #endif //ASSEMBLER_H

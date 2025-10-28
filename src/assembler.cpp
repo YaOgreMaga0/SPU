@@ -17,7 +17,6 @@ int main(const int argc, const char* argv[])
         return 1;
     }
 
-    CleanBuf(&Text);
     MakeCode(&Text, FilenameOut);
     MemoryFree(&Text);
     return 0;
@@ -25,23 +24,18 @@ int main(const int argc, const char* argv[])
 
 int MakeCode(Index* Text, const char* FilenameOut)
 {
-    int code_commands_count = CodeSize(Text);
+    CleanBuf(Text);
 
     int LabelsCount = 0;
-    label* labels = FillLabels(&LabelsCount, Text);
+    label* labels = NULL;
+    int code_commands_count = CodeSize(Text, &LabelsCount, &labels);
 
     int* Code = (int*)calloc((size_t)code_commands_count, sizeof(int));
 
     int num = 0;
     for(int i = 0; i < Text->CntLines; i++)
     {
-        fprintf(stderr, "%d\n", i);
-        if(Text->index[i].string[0] == ':')
-        {
-            Code[num] = 0;
-            num++;
-        }
-        else
+        if(Text->index[i].string[0] != ':' && Text->index[i].len != 2)
         {
             int command_code = GetCommand(i, Text);
             if(command_code == UNKNOWN_COMMAND)
@@ -51,7 +45,7 @@ int MakeCode(Index* Text, const char* FilenameOut)
             }
 
             int Arguments_Count = Commands[command_code].Arguments_count;
-            Code[num] = ((command_code<<16) + Arguments_Count) ;
+            Code[num] = command_code;
             num++;
 
             for(int j = 0; j < Arguments_Count; j++)
@@ -65,7 +59,7 @@ int MakeCode(Index* Text, const char* FilenameOut)
                             arg = GetPushArg(Text, i, k);
                         else
                         {
-                            if(Text->index[i].string[0] == 'J')
+                            if(Text->index[i].string[0] == 'J' || Text->index[i].string[0] == 'C')
                                 arg = GetJumpArg(Text, i, k, LabelsCount, labels);
                             else
                                 arg = GetArg(Text, i, k);
@@ -112,7 +106,7 @@ int GetJumpArg(Index* Text, int i, int j, int LabelsCount, label* labels)
 {
     for(int k = 0; k < LabelsCount; k++)
     {
-        if(strcmp(&(Text->index[i].string[j+1]), labels[k].name) == 0)
+        if(strcmp(&(Text->index[i].string[j+2]), labels[k].name) == 0)
             return labels[k].pointer;
     }
     fprintf(stderr, "Jump to unknown label in line %d", i + 1);
@@ -121,31 +115,53 @@ int GetJumpArg(Index* Text, int i, int j, int LabelsCount, label* labels)
 
 int GetArg(Index* Text, int i, int j)
 {
-    char* reg_name = &(Text->index[i].string[j]);
+    j++;
     if(Text->index[i].string[j] == '[')
-        reg_name++;
+        j++;
     for(int k = 0; k < reg_count; k++)
     {
-        if(strcmp(RegNames[k], reg_name) == 0)
+        if(strncmp(RegNames[k], &(Text->index[i].string[j]), 2) == 0)
             return k;
     }
-    fprintf(stderr, "unknown register");
+    fprintf(stderr, "unknown register in line %d\n", i + 1);
     return UNKNOWN_REGISTER;
 }
 
-int CodeSize(Index* Text)
+int CodeSize(Index* Text, int* LabelsCount, label** labels)
 {
-    int code_commands_count = Text->CntLines;
     for(int i = 0; i < Text->CntLines; i++)
     {
-        if(Text->index[i].len == 0)
+        if(Text->index[i].string[0] == ':')
+            (*LabelsCount)++;
+    }
+    *labels = (label*)calloc((size_t)(*LabelsCount), sizeof(label));
+
+    int label_number = 0;
+
+    int code_commands_count = 0;
+    for(int i = 0; i < Text->CntLines; i++)
+    {
+        code_commands_count++;
+        if(Text->index[i].len == 2)
             code_commands_count--;
         else
         {
             if(Text->index[i].string[0] != ':')
             {
                 int command_code = GetCommand(i, Text);
+                if(command_code == UNKNOWN_COMMAND)
+                {
+                    fprintf(stderr, "unknown command in line %d", i + 1);
+                    return UNKNOWN_COMMAND;
+                }
                 code_commands_count += Commands[command_code].Arguments_count;
+            }
+            else
+            {
+                (*labels)[label_number].name = &(Text->index[i].string[1]);
+                (*labels)[label_number].pointer = code_commands_count - label_number - 2;
+                label_number++;
+                code_commands_count--;
             }
         }
     }
@@ -156,7 +172,7 @@ int CleanBuf(Index* Text)
 {
     for(int i = 0; i < Text->CntLines; i++)
     {
-        for(unsigned int j = 0; j < (size_t)Text->index[i].len; j++)
+        for(int j = 0; j < Text->index[i].len; j++)
         {
             if(Text->index[i].string[j] == ' ')
                 Text->index[i].string[j] = '\n';
@@ -175,25 +191,4 @@ int FillSignature(FILE* OutFile, int code_commands_count)
     fwrite(&assembler_version, sizeof(float), 1, OutFile);
     fwrite(&code_commands_count, sizeof(int), 1, OutFile);
     return 0;
-}
-
-label* FillLabels(int* LabelsCount, Index* Text)
-{
-    for(int i = 0; i < Text->CntLines; i++)
-    {
-        if(Text->index[i].string[0] == ':')
-            (*LabelsCount)++;
-    }
-    label* labels = (label*)calloc((size_t)(*LabelsCount), sizeof(label));
-    int label_number = 0;
-    for(int i = 0; i < Text->CntLines; i++)
-    {
-        if(Text->index[i].string[0] == ':')
-        {
-            labels[label_number].name = &(Text->index[i].string[1]);
-            labels[label_number].pointer = i;
-            label_number++;
-        }
-    }
-    return labels;
 }

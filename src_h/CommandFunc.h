@@ -29,7 +29,7 @@ void popmem(SPUMem* SPUMemory);
 const command Commands[count_of_commands] =
 {
     {"HLT", HLT, 0, NULL},
-    {"PUSH", PUSH, 1, &push},
+    {"PUSH\n", PUSH, 1, &push},
     {"OUT", OUT, 0, &out},
     {"ADD", ADD, 0, &add},
     {"SUB", SUB, 0, &sub},

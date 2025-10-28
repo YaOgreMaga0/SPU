@@ -25,8 +25,12 @@ int SPUInit(SPUMem* SPUMemory, const char* FilenameIn)
         fprintf(stderr, "incorrect input file\n");
         return -1;
     }
-
-    SPUMemory->command_pointer = signature_size;
+    for(int i = 0; i < vertical; i++)
+    {
+        for(int j = 0; j < horizontal; j++)
+            SPUMemory->RAM[i * horizontal + j] = '.';
+    }
+    SPUMemory->command_pointer = 0;
     SPUMemory->code_commands_count = CheckSignature(Code);
     StackCtor(&(SPUMemory->Calculations), stack_size);
     SPUMemory->commands = (int*)calloc((size_t)SPUMemory->code_commands_count, sizeof(int));
@@ -61,12 +65,10 @@ int SPUDeInit(SPUMem* SPUMemory)
 
 int SPU(SPUMem* SPUMemory)
 {
-    short comm = 0;
+    int comm = 0;
     for(;SPUMemory->command_pointer < SPUMemory->code_commands_count; SPUMemory->command_pointer++)
     {
-        comm = *(short*)(SPUMemory->commands + sizeof(short) * (size_t)SPUMemory->command_pointer);
-        fprintf(stderr, "%hd\n", comm);
-        SPUMemory->command_pointer++;
+        comm = SPUMemory->commands[SPUMemory->command_pointer];
         if(comm == HLT)
             return HLT;
         else

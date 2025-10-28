@@ -2,6 +2,7 @@
 
 void push(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int arg = SPUMemory->commands[SPUMemory->command_pointer];
     StackPush(&SPUMemory->Calculations, arg);
 }
@@ -42,24 +43,28 @@ void div(SPUMem* SPUMemory)
 
 void pushr(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int reg = SPUMemory->commands[SPUMemory->command_pointer];
     SPUMemory->registers[reg] = StackPop(&SPUMemory->Calculations);
 }
 
 void popr(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int reg = SPUMemory->commands[SPUMemory->command_pointer];
     StackPush(&SPUMemory->Calculations, SPUMemory->registers[reg]);
 }
 
 void jmp(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     SPUMemory->command_pointer = label_pointer;
 }
 
 void jb(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     int value1 = StackPop(&SPUMemory->Calculations);
     int value2 = StackPop(&SPUMemory->Calculations);
@@ -69,6 +74,7 @@ void jb(SPUMem* SPUMemory)
 
 void jbe(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     int value1 = StackPop(&SPUMemory->Calculations);
     int value2 = StackPop(&SPUMemory->Calculations);
@@ -78,6 +84,7 @@ void jbe(SPUMem* SPUMemory)
 
 void ja(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     int value1 = StackPop(&SPUMemory->Calculations);
     int value2 = StackPop(&SPUMemory->Calculations);
@@ -87,6 +94,7 @@ void ja(SPUMem* SPUMemory)
 
 void jae(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     int value1 = StackPop(&SPUMemory->Calculations);
     int value2 = StackPop(&SPUMemory->Calculations);
@@ -96,6 +104,7 @@ void jae(SPUMem* SPUMemory)
 
 void je(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     int value1 = StackPop(&SPUMemory->Calculations);
     int value2 = StackPop(&SPUMemory->Calculations);
@@ -105,6 +114,7 @@ void je(SPUMem* SPUMemory)
 
 void jne(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     int value1 = StackPop(&SPUMemory->Calculations);
     int value2 = StackPop(&SPUMemory->Calculations);
@@ -114,6 +124,7 @@ void jne(SPUMem* SPUMemory)
 
 void call(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int label_pointer = SPUMemory->commands[SPUMemory->command_pointer];
     StackPush(&SPUMemory->Returns, SPUMemory->command_pointer);
     SPUMemory->command_pointer = label_pointer;
@@ -137,16 +148,16 @@ void draw(SPUMem* SPUMemory)
 
 void pushmem(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int reg = SPUMemory->commands[SPUMemory->command_pointer];
-    int value = SPUMemory->registers[reg];
+    SPUMemory->RAM[SPUMemory->registers[reg]] = '#';
     SPUMemory->registers[reg] = 0;
-    SPUMemory->RAM[reg] = value;
 }
 
 void popmem(SPUMem* SPUMemory)
 {
+    SPUMemory->command_pointer++;
     int reg = SPUMemory->commands[SPUMemory->command_pointer];
-    int value = SPUMemory->registers[reg];
+    SPUMemory->RAM[SPUMemory->registers[reg]] = '.';
     SPUMemory->registers[reg] = 0;
-    StackPush(&SPUMemory->Calculations, value);
 }
